@@ -73,7 +73,7 @@ const UserDropdown = (props: TProps) => {
   const { user, logout, setUser } = useAuth()
 
   // ** Redux
-  const { userData } = useSelector((state: RootState) => state.auth)
+  // const { userData } = useSelector((state: RootState) => state.auth)
   const permissionUser = user?.role?.permissions ?? []
 
   const open = Boolean(anchorEl)
@@ -108,11 +108,11 @@ const UserDropdown = (props: TProps) => {
     handleClose()
   }
 
-  useEffect(() => {
-    if (userData) {
-      setUser({ ...userData })
-    }
-}, [userData])
+  // useEffect(() => {
+  //   if (userData) {
+  //     setUser({ ...userData })
+  //   }
+  // }, [userData])
 
   return (
     <React.Fragment>
