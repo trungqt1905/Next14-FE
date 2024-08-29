@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 // Material-UI
 import Button from '@mui/material/Button'
@@ -24,6 +24,7 @@ import LoginLight from '/public/images/login-light.png'
 import LoginDark from '/public/images/login-dark.png'
 import CustomTextField from 'src/components/core/text-field'
 import Link from 'next/link'
+import { useAuth } from 'src/hooks/useAuth'
 
 type TProps = {}
 
@@ -34,6 +35,12 @@ const LoginPage: NextPage<TProps> = () => {
 
   // theme
   const theme = useTheme()
+
+  //hook useAuth là một custom hook
+  //được định nghĩa để sử dụng context
+  //xác thực. Khi bạn gọi useAuth trong một component,
+  //nó sẽ trả về giá trị hiện tại của AuthContext.
+  const { login } = useAuth()
 
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
@@ -53,7 +60,10 @@ const LoginPage: NextPage<TProps> = () => {
     resolver: yupResolver(schema)
   })
   const onsubmit = (data: { email: string; password: string }) => {
-    console.log(data)
+    if (!Object.keys(errors)?.length) {
+      login({ ...data, rememberMe: isRemember })
+    }
+    login({ ...data, rememberMe: isRemember })
   }
 
   return (
@@ -231,6 +241,7 @@ const LoginPage: NextPage<TProps> = () => {
                     fill='currentColor'
                     d='M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z'
                   ></path>
+                  j
                 </svg>
               </IconButton>
               <IconButton

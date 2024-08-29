@@ -1,17 +1,16 @@
 // ** React Imports
-import { createContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, ReactNode, useState } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
 
 // ** Axios
-import axios from 'axios'
 
 // ** Config
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, LoginParams, ErrCallbackType, UserDataType } from './types'
+import { AuthValuesType, ErrCallbackType, LoginParams, UserDataType } from './types'
 
 import { loginAuth } from 'src/services/auth'
 
@@ -42,6 +41,8 @@ const AuthProvider = ({ children }: Props) => {
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
     loginAuth({ email: params.email, password: params.password })
       .then(async response => {
+        // Nếu rememberMe là true, lưu token vào localStorage
+        // RememberMe is true, save token to localStorage
         params.rememberMe
           ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.access_token)
           : null
