@@ -4,6 +4,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
+import { UserDataType } from 'src/contexts/types'
 
 interface DataParams {
   q: string
@@ -58,7 +59,8 @@ export const appUsersSlice = createSlice({
     data: [],
     total: 1,
     params: {},
-    allData: []
+    allData: [],
+    userData: {} as UserDataType
   },
   reducers: {},
   extraReducers: builder => {
@@ -67,6 +69,7 @@ export const appUsersSlice = createSlice({
       state.total = action.payload.total
       state.params = action.payload.params
       state.allData = action.payload.allData
+      state.userData = action.payload.userData
     })
   }
 })

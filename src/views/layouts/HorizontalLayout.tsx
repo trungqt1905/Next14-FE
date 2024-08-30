@@ -107,7 +107,7 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
           sx={{ flexGrow: 1, fontWeight: '600', cursor: 'pointer' }}
         >
           <Link style={{ color: 'inherit' }} href={ROUTE_CONFIG.HOME}>
-            LTTD
+            TQT
           </Link>
         </Typography>
         <LanguageDropdown />
