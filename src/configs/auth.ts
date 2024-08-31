@@ -1,6 +1,6 @@
 export default {
-  storageTokenKeyName: 'accessToken',
-  onTokenExpiration: 'refreshToken'
+  storageTokenKeyName: 'access_token',
+  onTokenExpiration: 'refresh_token'
 }
 
 export const ACCESS_TOKEN = 'access_token'

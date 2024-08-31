@@ -10,12 +10,13 @@ import { useRouter } from 'next/router'
 import authConfig from 'src/configs/auth'
 
 // ** Types
-import { AuthValuesType, ErrCallbackType, LoginParams, UserDataType } from './types'
+import { AuthValuesType, ErrCallbackType, LoginParams, RegisterParams, UserDataType } from './types'
 
-import { loginAuth, logoutAuth } from 'src/services/auth'
+import { loginAuth, logoutAuth, registerAuth } from 'src/services/auth'
 import axios from 'axios'
 import { CONFIG_API } from 'src/configs/api'
 import { removeLocalUserData, setLocalUserData } from 'src/helpers/storage'
+import instanceAxios from 'src/helpers/axios'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -24,7 +25,8 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve()
+  logout: () => Promise.resolve(),
+  register: () => Promise.resolve()
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -43,20 +45,24 @@ const AuthProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
+      // Lấy token truy cập từ localStorage
+      // bằng khóa được định nghĩa trong authConfig.
       const storedToken = window.localStorage.getItem(authConfig.storageTokenKeyName)
       if (storedToken) {
+        // Kiểm tra xem token có tồn tại hay không. Nếu có, thực hiện các bước tiếp theo để xác thực người dùng.
         setLoading(true)
-        axios
-          .get(CONFIG_API.AUTH.AUTH_ME, {
-            headers: {
-              Authorization: `Bearer ${storedToken}`
-            }
-          })
+        await instanceAxios
+          .get(CONFIG_API.AUTH.AUTH_ME)
           .then(async response => {
             setUser(response.data)
             setLoading(false)
-          })
+          }) // Nếu yêu cầu thành công,
+          // cập nhật trạng thái người dùng (setUser(response.data)) và đặt trạng thái loading thành false.
           .catch(() => {
+            // Nếu yêu cầu thất bại, xóa dữ liệu người dùng khỏi localStorage
+            // (removeLocalUserData), đặt trạng thái người dùng thành null,
+            // đặt trạng thái loading thành false, và chuyển hướng đến trang đăng nhập nếu
+            // không phải đang ở trang đăng nhập.
             removeLocalUserData()
             setUser(null)
             setLoading(false)
@@ -108,13 +114,31 @@ const AuthProvider = ({ children }: Props) => {
       })
   }
 
+  const handleRegister = (params: RegisterParams, errorCallback?: ErrCallbackType) => {
+    registerAuth({ email: params.email, password: params.password })
+      .then(async response => {
+        // Nếu rememberMe là true, lưu token vào localStorage
+        // RememberMe is true, save token to localStorage
+        params.rememberMe
+          ? setLocalUserData(JSON.stringify(response.data.user), response.data.access_token, response.data.refresh)
+          : null
+        const returnUrl = router.query.returnUrl
+        setUser({ ...response.data.user })
+        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
+        router.replace(redirectURL as string)
+      })
+      .catch(err => {
+        if (errorCallback) errorCallback(err)
+      })
+  }
   const values = {
     user,
     loading,
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout
+    logout: handleLogout,
+    register: handleRegister
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

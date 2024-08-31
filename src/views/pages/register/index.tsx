@@ -22,6 +22,7 @@ import RegisterDark from '/public/images/register-dark.png'
 import RegisterLight from '/public/images/register-light.png'
 import Link from 'next/link'
 import CustomTextField from 'src/components/core/text-field'
+import { useAuth } from 'src/hooks/useAuth'
 
 type TProps = {}
 
@@ -39,12 +40,18 @@ const RegisterPage: NextPage<TProps> = () => {
   // theme
   const theme = useTheme()
 
+  const { register } = useAuth()
+
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
     password: yup.string().required("Password can't be empty."),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password'), ''], 'Confirm password must match')
+
+      // yup.ref('password') tham chiếu đến giá trị của trường password trong cùng một schema.
+      // ''cho phép giá trị rỗng (nếu cần thiêt )
+
       .required("Password can't be empty.")
   })
 
@@ -63,7 +70,10 @@ const RegisterPage: NextPage<TProps> = () => {
     resolver: yupResolver(schema)
   })
   const onsubmit = (data: { email: string; password: string }) => {
-    console.log(data)
+    if (!Object.keys(errors)?.length) {
+      register({ ...data, rememberMe: isRemember })
+    }
+    register({ ...data, rememberMe: isRemember })
   }
 
   return (
