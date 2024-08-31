@@ -12,7 +12,7 @@ import authConfig from 'src/configs/auth'
 // ** Types
 import { AuthValuesType, ErrCallbackType, LoginParams, UserDataType } from './types'
 
-import { loginAuth } from 'src/services/auth'
+import { loginAuth, logoutAuth } from 'src/services/auth'
 import axios from 'axios'
 import { CONFIG_API } from 'src/configs/api'
 import { removeLocalUserData, setLocalUserData } from 'src/helpers/storage'
@@ -47,7 +47,7 @@ const AuthProvider = ({ children }: Props) => {
       if (storedToken) {
         setLoading(true)
         axios
-          .get(CONFIG_API.AUTH.INDEX, {
+          .get(CONFIG_API.AUTH.AUTH_ME, {
             headers: {
               Authorization: `Bearer ${storedToken}`
             }
@@ -95,9 +95,17 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleLogout = () => {
-    setUser(null)
-    removeLocalUserData()
-    router.push('/login')
+    logoutAuth()
+      .then(() => {
+        removeLocalUserData()
+        setUser(null)
+        router.push('/login')
+      })
+      .catch(() => {
+        removeLocalUserData()
+        setUser(null)
+        router.push('/login')
+      })
   }
 
   const values = {
