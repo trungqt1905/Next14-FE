@@ -25,6 +25,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { Button } from '@mui/material'
 import { useRouter } from 'next/router'
 import { ROUTE_CONFIG } from 'src/configs/route'
+import { useTranslation } from 'react-i18next'
 
 // config
 // import { ROUTE_CONFIG } from 'src/configs/route'
@@ -65,6 +66,7 @@ const AppBar = styled(MuiAppBar, {
 const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) => {
   const { user } = useAuth()
   const router = useRouter()
+  const { t, i18n } = useTranslation()
 
   const handleNavigateLogin = () => {
     if (router.asPath !== '/') {
@@ -117,7 +119,7 @@ const HorizontalLayout: NextPage<TProps> = ({ open, toggleDrawer, isHideMenu }) 
           <UserDropdown />
         ) : (
           <Button variant='contained' sx={{ ml: 2, width: 'auto' }} onClick={handleNavigateLogin}>
-            Sign In
+            {t('Sign In')}
           </Button>
         )}
       </Toolbar>

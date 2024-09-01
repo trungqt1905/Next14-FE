@@ -25,6 +25,7 @@ import LoginDark from '/public/images/login-dark.png'
 import CustomTextField from 'src/components/core/text-field'
 import Link from 'next/link'
 import { useAuth } from 'src/hooks/useAuth'
+import { useTranslation } from 'react-i18next'
 
 type TProps = {}
 
@@ -35,6 +36,8 @@ const LoginPage: NextPage<TProps> = () => {
 
   // theme
   const theme = useTheme()
+
+  const { t } = useTranslation()
 
   //hook useAuth là một custom hook
   //được định nghĩa để sử dụng context
@@ -118,7 +121,7 @@ const LoginPage: NextPage<TProps> = () => {
           }}
         >
           <Typography component='h1' variant='h5'>
-            Sign in
+            {t('Sign in')}
           </Typography>
           <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
             <Box sx={{ width: '300px' }}>
@@ -132,7 +135,7 @@ const LoginPage: NextPage<TProps> = () => {
                     margin='normal'
                     fullWidth
                     required
-                    label='Email'
+                    label={t('Sign in')}
                     autoComplete='email'
                     autoFocus
                     onChange={onChange}
@@ -156,7 +159,7 @@ const LoginPage: NextPage<TProps> = () => {
                     margin='normal'
                     fullWidth
                     required
-                    label='Password'
+                    label={t('Password')}
                     type={showPassword ? 'text' : 'password'}
                     autoComplete='current-password'
                     onChange={onChange}
