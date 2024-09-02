@@ -17,7 +17,7 @@ import VerticalLayout from 'src/views/layouts/VerticalLayout'
 
 type TProps = {
   children: React.ReactNode
-}
+} 
 
 const UserLayout: NextPage<TProps> = ({ children }) => {
   const [open, setOpen] = React.useState(true)
