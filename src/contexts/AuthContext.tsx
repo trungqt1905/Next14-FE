@@ -78,8 +78,11 @@ const AuthProvider = ({ children }: Props) => {
   }, [])
 
   const handleLogin = (params: LoginParams, errorCallback?: ErrCallbackType) => {
+    setLoading(true)
     loginAuth({ email: params.email, password: params.password })
       .then(async response => {
+        setLoading(false)
+
         // Nếu rememberMe là true, lưu token vào localStorage
         // RememberMe is true, save token to localStorage
         params.rememberMe
@@ -96,6 +99,7 @@ const AuthProvider = ({ children }: Props) => {
       })
 
       .catch(err => {
+        setLoading(false)
         if (errorCallback) errorCallback(err)
       })
   }

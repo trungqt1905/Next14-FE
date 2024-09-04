@@ -1,4 +1,9 @@
 {
     "Sign In" : "Đăng nhập",
-    "Password" :  "Mật khẩu"
+    "Password" :  "Mật khẩu",
+    "My_profile" : "Hồ sơ của tôi",
+    "My_products" : "Sản phẩm của tôi",
+    "Change_password" : "Thay đổi mật khẩu",
+    "Logout" : "Đăng xuất",
+    "Manage_system" : "Quản lý hệ thống"
 }
