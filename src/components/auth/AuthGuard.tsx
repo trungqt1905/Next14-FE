@@ -37,7 +37,7 @@ const AuthGuard = (props: AuthGuardProps) => {
       window.localStorage.getItem(ACCESS_TOKEN) === null &&
       window.localStorage.getItem(USER_DATA) === null
     ) {
-      if (router.asPath !== '/') {
+      if (router.asPath !== '/' && router.asPath !== '/login') {
         router.replace({
           pathname: '/login',
           query: { returnUrl: router.asPath } // Đang ở product thì chuyển qua login,

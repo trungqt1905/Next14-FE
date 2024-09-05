@@ -5,5 +5,15 @@
     "My_products" : "Sản phẩm của tôi",
     "Change_password" : "Thay đổi mật khẩu",
     "Logout" : "Đăng xuất",
-    "Manage_system" : "Quản lý hệ thống"
+    "Manage_system" : "Quản lý hệ thống",
+    "Change_avatar": "Thay đổi ảnh đại diện",
+    "Enter_your_email" : "Nhập email của bạn",
+    "role" : "Nhóm vai trò của bạn",
+    "enter_your_address" : "Nhập địa chỉ của bạn",
+    "enter_your_city" : "Nhập thành phố của bạn",
+    "Enter_your_phone_number" : "Nhập số điện thoại của bạn",
+    "Enter_your_full_name": "Nhập họ và tên của bạn",
+    "City" : "Thành phố",
+    "Phone_number" : "Số điện thoại",
+    "Full_name": "Họ và tên"
 }

@@ -25,9 +25,9 @@ const GuestGuard = (props: GuestGuardProps) => {
     } // Nếu có token truy cập dữ liệu người dùng trong localstorage chuyển hướng về trang chủ
   }, [router.route])
 
-  if (authContext.loading || (!authContext.loading && authContext.user !== null)) {
-    return fallback
-  } // Hiển thị fallback nếu đang tải hoặc người dùng đã đăng nhập, ngược lại hiển thị các thành phần con.
+  // if (authContext.loading || (!authContext.loading && authContext.user !== null)) {
+  //   return fallback
+  // } // Hiển thị fallback nếu đang tải hoặc người dùng đã đăng nhập, ngược lại hiển thị các thành phần con.
 
   return <>{children}</>
 }
