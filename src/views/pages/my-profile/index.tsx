@@ -1,5 +1,5 @@
 import { NextPage } from 'next'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // Material-UI
 import Button from '@mui/material/Button'
@@ -37,20 +37,12 @@ type TDefaultValues = {
   fullName: string
 }
 const MyProfilePage: NextPage<TProps> = () => {
-  // state
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isRemember, setIsRemember] = useState(true)
-
   const { user } = useAuth()
+
+  const { t } = useTranslation()
 
   // theme
   const theme = useTheme()
-
-  // useTranslation hook
-  const { t } = useTranslation()
-
-  const { register } = useAuth()
 
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
@@ -72,6 +64,7 @@ const MyProfilePage: NextPage<TProps> = () => {
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors }
   } = useForm({
     defaultValues,
@@ -88,6 +81,20 @@ const MyProfilePage: NextPage<TProps> = () => {
   }) => {
     console.log(data)
   }
+
+  useEffect(() => {
+    if (user) {
+      setValue('email', user?.data?.email)
+      setValue('role', user?.data?.role?.name)
+      setValue('address', user?.data?.addresses[0]?.address)
+      setValue('city', user?.data?.addresses[0]?.city)
+      setValue(
+        'fullName',
+        `${user?.data?.addresses[0]?.firstName ?? ''} ${user?.data?.addresses[0]?.middleName ?? ''} ${user?.data?.addresses[0]?.lastName ?? ''}`
+      )
+      setValue('phoneNumber', user?.data?.addresses[0]?.phoneNumber)
+    }
+  }, [user, setValue])
 
   const handleSubmitUploadAvatar = (file: File) => {
     console.log(file)
@@ -124,7 +131,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                   >
                     <Button variant='tonal'>
                       <IconifyIcon icon='mdi:camera' width={16} height={16} opacity={0.6} />
-                      {t('Change_avatar')}
+                      <span>{t('Change_avatar')}</span>
                     </Button>
                   </WrapperFileUpload>
                 </Box>
@@ -177,8 +184,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                         onChange={onChange}
                         onBlur={onBlur}
                         value={value}
-                        error={!!errors.role}
-                        helperText={errors?.role?.message}
                         InputProps={{
                           readOnly: true
                         }}
@@ -190,7 +195,7 @@ const MyProfilePage: NextPage<TProps> = () => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid container xs={12} sm={6} sx={{ padding: 0 }} spacing={4} marginTop={13}>
+          <Grid container xs={12} sm={6} sx={{ padding: 0 }} spacing={4} marginTop={15}>
             <Grid item xs={12} sm={6} sx={{ padding: 0 }}>
               <Box sx={{ width: '100%' }}>
                 <Controller
@@ -210,8 +215,8 @@ const MyProfilePage: NextPage<TProps> = () => {
                       onChange={onChange}
                       onBlur={onBlur}
                       value={value}
-                      error={!!errors.email}
-                      helperText={errors?.email?.message}
+                      error={!!errors.address}
+                      helperText={errors?.address?.message}
                     />
                   )}
                   name='address'

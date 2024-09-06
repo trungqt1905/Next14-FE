@@ -25,8 +25,7 @@ const defaultProvider: AuthValuesType = {
   setUser: () => null,
   setLoading: () => Boolean,
   login: () => Promise.resolve(),
-  logout: () => Promise.resolve(),
-  register: () => Promise.resolve()
+  logout: () => Promise.resolve()
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -118,31 +117,13 @@ const AuthProvider = ({ children }: Props) => {
       })
   }
 
-  const handleRegister = (params: RegisterParams, errorCallback?: ErrCallbackType) => {
-    registerAuth({ email: params.email, password: params.password })
-      .then(async response => {
-        // Nếu rememberMe là true, lưu token vào localStorage
-        // RememberMe is true, save token to localStorage
-        params.rememberMe
-          ? setLocalUserData(JSON.stringify(response.data.user), response.data.access_token, response.data.refresh)
-          : null
-        const returnUrl = router.query.returnUrl
-        setUser({ ...response.data.user })
-        const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
-        router.replace(redirectURL as string)
-      })
-      .catch(err => {
-        if (errorCallback) errorCallback(err)
-      })
-  }
   const values = {
     user,
     loading,
     setUser,
     setLoading,
     login: handleLogin,
-    logout: handleLogout,
-    register: handleRegister
+    logout: handleLogout
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

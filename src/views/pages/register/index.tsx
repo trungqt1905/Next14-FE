@@ -23,6 +23,9 @@ import RegisterLight from '/public/images/register-light.png'
 import Link from 'next/link'
 import CustomTextField from 'src/components/core/text-field'
 import { useAuth } from 'src/hooks/useAuth'
+import { useDispatch, useSelector } from 'react-redux'
+import { registerAuthAsync } from 'src/stores/apps/auth/action'
+import { AppDispatch, RootState } from 'src/stores'
 
 type TProps = {}
 
@@ -37,10 +40,12 @@ const RegisterPage: NextPage<TProps> = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isRemember, setIsRemember] = useState(true)
 
+  // redux
+  const dispatch: AppDispatch = useDispatch()
+  const {} = useSelector((state: RootState) => state.auth)
+
   // theme
   const theme = useTheme()
-
-  const { register } = useAuth()
 
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
@@ -51,7 +56,6 @@ const RegisterPage: NextPage<TProps> = () => {
 
       // yup.ref('password') tham chiếu đến giá trị của trường password trong cùng một schema.
       // ''cho phép giá trị rỗng (nếu cần thiêt )
-
       .required("Password can't be empty.")
   })
 
@@ -70,10 +74,12 @@ const RegisterPage: NextPage<TProps> = () => {
     resolver: yupResolver(schema)
   })
   const onsubmit = (data: { email: string; password: string }) => {
-    if (!Object.keys(errors)?.length) {
-      register({ ...data, rememberMe: isRemember })
-    }
-    register({ ...data, rememberMe: isRemember })
+    dispatch(
+      registerAuthAsync({
+        email: data.email,
+        password: data.password
+      })
+    )
   }
 
   return (

@@ -23,22 +23,24 @@ export type TUserAddresses = {
 }
 
 export type UserDataType = {
-  _id: string
-  role: {
-    name: string
-    permissions: string[]
+  data: {
+    _id: string
+    role: {
+      name: string
+      permissions: string[]
+    }
+    email: string
+    firstName: string
+    lastName: string
+    middleName: string
+    password: string
+    avatar?: string | null
+    likedProducts: string[]
+    city: string
+    phoneNumber: string
+    address?: string
+    addresses: TUserAddresses[]
   }
-  email: string
-  firstName: string
-  lastName: string
-  middleName: string
-  password: string
-  avatar?: string | null
-  likedProducts: string[]
-  city: string
-  phoneNumber: string
-  address?: string
-  addresses: TUserAddresses[]
 }
 
 export type AuthValuesType = {
@@ -48,5 +50,4 @@ export type AuthValuesType = {
   setLoading: (value: boolean) => void
   setUser: (value: UserDataType | null) => void
   login: (params: LoginParams, errorCallback?: ErrCallbackType) => void
-  register: (params: RegisterParams, errorCallback?: ErrCallbackType) => void
 }
