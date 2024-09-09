@@ -8,6 +8,10 @@ export type TRegisterAuth = {
   password: string
 }
 
+export type TUpdateAuthMe = {
+  
+}
+
 export type TChangePassword = {
   currentPassword: string
   newPassword: string

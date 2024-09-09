@@ -5,7 +5,7 @@ import { CONFIG_API } from 'src/configs/api'
 import instanceAxios from 'src/helpers/axios'
 
 // ** types
-import { TLoginAuth, TRegisterAuth } from 'src/types/auth'
+import { TLoginAuth, TRegisterAuth, TUpdateAuthMe } from 'src/types/auth'
 
 export const loginAuth = async (data: TLoginAuth) => {
   try {
@@ -35,8 +35,36 @@ export const registerAuth = async (data: TRegisterAuth) => {
   } catch (error: any) {
     return {
       data: null,
-      message: error?.response?.data?.message,
-      typeError: error?.response?.data?.typeError
+      message: error.response.data.message,
+      typeError: error.response.data.typeError
+    }
+  }
+}
+
+export const getAuthMe = async () => {
+  try {
+    const res = await instanceAxios.get(`${CONFIG_API.AUTH.INDEX}/me`)
+
+    return res.data
+  } catch (error: any) {
+    return {
+      data: null,
+      message: error.response.data.message,
+      typeError: error.response.data.typeError
+    }
+  }
+}
+
+export const updateAuthMe = async (data: any) => {
+  try {
+    const res = await instanceAxios.put(`${CONFIG_API.AUTH.INDEX}/me`, data)
+
+    return res.data
+  } catch (error: any) {
+    return {
+      data: null,
+      message: error.response.data.message,
+      typeError: error.response.data.typeError
     }
   }
 }

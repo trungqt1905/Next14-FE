@@ -1,30 +1,29 @@
 import { NextPage } from 'next'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Material-UI
-import Button from '@mui/material/Button'
-import CssBaseline from '@mui/material/CssBaseline'
+import { Avatar, Grid, useTheme } from '@mui/material'
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import { Avatar, Grid, Icon, IconButton, InputAdornment, useTheme } from '@mui/material'
+import Button from '@mui/material/Button'
 
 // custom components
 import IconifyIcon from 'src/components/Icon'
 
 // React Hook Form
-import { Controller, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { Controller, useForm } from 'react-hook-form'
 import * as yup from 'yup'
 
 // images
-import Image from 'next/image'
-import RegisterDark from '/public/images/register-dark.png'
-import RegisterLight from '/public/images/register-light.png'
-import Link from 'next/link'
-import CustomTextField from 'src/components/core/text-field'
-import { useAuth } from 'src/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
+import CustomTextField from 'src/components/core/text-field'
 import WrapperFileUpload from 'src/components/wrapper-file-upload'
+import { useAuth } from 'src/hooks/useAuth'
+import { getAuthMe } from 'src/services/auth'
+import { removeLocalUserData } from 'src/helpers/storage'
+import { useRouter } from 'next/router'
+import { UserDataType } from 'src/contexts/types'
+import { toFullName } from 'src/utils'
 
 type TProps = {}
 
@@ -37,9 +36,14 @@ type TDefaultValues = {
   fullName: string
 }
 const MyProfilePage: NextPage<TProps> = () => {
-  const { user } = useAuth()
-
   const { t } = useTranslation()
+
+  // Hooks
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<UserDataType | null>(null)
+
+  // ** Router
+  const router = useRouter()
 
   // theme
   const theme = useTheme()
@@ -47,10 +51,10 @@ const MyProfilePage: NextPage<TProps> = () => {
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
     role: yup.string().email().required("Role can't be empty."),
-    address: yup.string().required("Address can't be empty."),
+    fullName: yup.string().required("Full name can't be empty."),
+    phoneNumber: yup.string().required("Phone number can't be empty.").min(8, 'The phone number is min 8 number'),
     city: yup.string().required("City can't be empty."),
-    phoneNumber: yup.string().required("Phone number can't be empty."),
-    fullName: yup.string().required("Full name can't be empty.")
+    address: yup.string().required("Address can't be empty.")
   })
 
   const defaultValues: TDefaultValues = {
@@ -65,7 +69,8 @@ const MyProfilePage: NextPage<TProps> = () => {
     control,
     handleSubmit,
     setValue,
-    formState: { errors }
+    formState: { errors },
+    reset
   } = useForm({
     defaultValues,
     mode: 'onBlur',
@@ -82,11 +87,37 @@ const MyProfilePage: NextPage<TProps> = () => {
     console.log(data)
   }
 
+  const fetchGetAuthMe = async () => {
+    await getAuthMe()
+      .then(async response => {
+        setLoading(false)
+        const data = response?.data
+        console.log(data)
+
+        if (data) {
+          reset({
+            email: data?.email,
+            address: data?.address,
+            city: data?.city,
+            phoneNumber: data?.phoneNumber,
+            role: data?.role?.name,
+            fullName: toFullName(data?.firstName, data?.lastName, data?.middleName, 'en')
+          })
+        }
+
+        setUser(response.data)
+        setLoading(false)
+      })
+      .catch(() => {
+        removeLocalUserData()
+        setUser(null)
+        setLoading(false)
+      })
+  }
+
   useEffect(() => {
-    if (user) {
-      setValue('role', user?.data.role?.name)
-    }
-  }, [user, setValue])
+    fetchGetAuthMe()
+  }, [])
 
   const handleSubmitUploadAvatar = (file: File) => {
     console.log(file)
@@ -123,7 +154,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                   >
                     <Button variant='tonal'>
                       <IconifyIcon icon='mdi:camera' width={16} height={16} opacity={0.6} />
-                      <span>{t('Change_avatar')}</span>
+                      <span>{t('Change Avatar')}</span>
                     </Button>
                   </WrapperFileUpload>
                 </Box>
@@ -140,6 +171,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                     render={({ field: { onChange, onBlur, value } }) => (
                       <CustomTextField
                         margin='normal'
+                        disabled
                         fullWidth
                         required
                         label='Email'
@@ -176,9 +208,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                         onChange={onChange}
                         onBlur={onBlur}
                         value={value}
-                        InputProps={{
-                          readOnly: true
-                        }}
+                        disabled
                       />
                     )}
                     name='role'
@@ -199,7 +229,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                     <CustomTextField
                       margin='normal'
                       fullWidth
-                      required
                       label='Address'
                       autoComplete='address'
                       placeholder={t('enter_your_address')}
@@ -207,8 +236,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                       onChange={onChange}
                       onBlur={onBlur}
                       value={value}
-                      error={!!errors.address}
-                      helperText={errors?.address?.message}
                     />
                   )}
                   name='address'
@@ -226,7 +253,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                     <CustomTextField
                       margin='normal'
                       fullWidth
-                      required
                       label={t('City')}
                       autoComplete='city'
                       placeholder={t('enter_your_city')}
@@ -234,8 +260,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                       onChange={onChange}
                       onBlur={onBlur}
                       value={value}
-                      error={!!errors.city}
-                      helperText={errors?.city?.message}
                     />
                   )}
                   name='city'
@@ -258,7 +282,17 @@ const MyProfilePage: NextPage<TProps> = () => {
                       autoComplete='phoneNumber'
                       autoFocus
                       placeholder={t('Enter_your_phone_number')}
-                      onChange={onChange}
+                      onChange={e => {
+                        const value = e.target.value
+                        if (value.match(/^\d+$/) || value === '') {
+                          onChange(value)
+                        }
+                      }}
+                      inputProps={{
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
+                        maxLength: 10
+                      }}
                       onBlur={onBlur}
                       value={value}
                       error={!!errors.phoneNumber}

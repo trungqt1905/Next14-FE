@@ -23,7 +23,6 @@ export type TUserAddresses = {
 }
 
 export type UserDataType = {
-  data: any
   _id: string
   role: {
     name: string
