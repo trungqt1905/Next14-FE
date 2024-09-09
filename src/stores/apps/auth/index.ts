@@ -28,9 +28,17 @@ const initialState = {
 }
 
 export const authSlice = createSlice({
-  name: 'Auth',
+  name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    resetIntialState: state => {
+      state.isLoading = false
+      state.isSuccess = false
+      state.isError = true
+      state.typeError = ''
+      state.message = ''
+    }
+  },
   extraReducers: builder => {
     builder.addCase(registerAuthAsync.pending, (state, action) => {
       state.isLoading = true
@@ -39,17 +47,18 @@ export const authSlice = createSlice({
       state.isLoading = false
       state.isSuccess = !!action.payload?.data?.email // !! true nếu email tồn tồn tại - ngược lại
       state.isError = !action.payload?.data?.isError // message nếu tồn tại - ngược lại
-      state.message = action.payload?.data?.message
-      state.typeError = action.payload?.data?.typeError
+      state.message = action.payload?.message
+      state.typeError = action.payload?.typeError
     }) //Thành công
     builder.addCase(registerAuthAsync.rejected, (state, action) => {
       state.isLoading = false
       state.isSuccess = false
-      state.isError = true  
+      state.isError = true
       state.message = ''
       state.typeError = ''
     }) //Thất bại
   }
 })
 
+export const { resetIntialState } = authSlice.actions
 export default authSlice.reducer
