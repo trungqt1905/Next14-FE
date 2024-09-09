@@ -208,13 +208,13 @@ const RecursiveListItems: NextPage<TListItems> = ({
 const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({})
   const [activePath, setActivePath] = useState<null | string>('')
-  
+
   // ** permission
   const { user } = useAuth()
-  const permissionUser = user?.role?.permissions
-    ? user?.role?.permissions?.includes(PERMISSIONS.BASIC)
+  const permissionUser = user?.data?.role?.permissions
+    ? user?.data?.role?.permissions?.includes(PERMISSIONS.BASIC)
       ? [PERMISSIONS.DASHBOARD]
-      : user?.role?.permissions
+      : user?.data?.role?.permissions
     : []
 
   const listVerticalItems = VerticalItems()
