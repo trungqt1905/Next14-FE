@@ -84,15 +84,7 @@ const MyProfilePage: NextPage<TProps> = () => {
 
   useEffect(() => {
     if (user) {
-      setValue('email', user?.data?.email)
-      setValue('role', user?.data?.role?.name)
-      setValue('address', user?.data?.addresses[0]?.address)
-      setValue('city', user?.data?.addresses[0]?.city)
-      setValue(
-        'fullName',
-        `${user?.data?.addresses[0]?.firstName ?? ''} ${user?.data?.addresses[0]?.middleName ?? ''} ${user?.data?.addresses[0]?.lastName ?? ''}`
-      )
-      setValue('phoneNumber', user?.data?.addresses[0]?.phoneNumber)
+      setValue('role', user?.data.role?.name)
     }
   }, [user, setValue])
 

@@ -21,7 +21,7 @@ const AclGuard = (props: AclGuardProps) => {
   const { aclAbilities, children, guestGuard = false, authGuard = true } = props
   const auth = useAuth()
 
-  const permissions = auth.user?.data?.role?.permissions ?? []
+  const permissions = auth.user?.role?.permissions ?? []
 
   let ability: AppAbility
   const router = useRouter()

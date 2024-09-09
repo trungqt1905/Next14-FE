@@ -23,24 +23,23 @@ export type TUserAddresses = {
 }
 
 export type UserDataType = {
-  data: {
-    _id: string
-    role: {
-      name: string
-      permissions: string[]
-    }
-    email: string
-    firstName: string
-    lastName: string
-    middleName: string
-    password: string
-    avatar?: string | null
-    likedProducts: string[]
-    city: string
-    phoneNumber: string
-    address?: string
-    addresses: TUserAddresses[]
+  data: any
+  _id: string
+  role: {
+    name: string
+    permissions: string[]
   }
+  email: string
+  firstName: string
+  lastName: string
+  middleName: string
+  password: string
+  avatar?: string | null
+  likedProducts: string[]
+  city: string
+  phoneNumber: string
+  address?: string
+  addresses: TUserAddresses[]
 }
 
 export type AuthValuesType = {

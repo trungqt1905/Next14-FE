@@ -211,10 +211,10 @@ const ListVerticalLayout: NextPage<TProps> = ({ open }) => {
 
   // ** permission
   const { user } = useAuth()
-  const permissionUser = user?.data?.role?.permissions
-    ? user?.data?.role?.permissions?.includes(PERMISSIONS.BASIC)
+  const permissionUser = user?.role?.permissions
+    ? user?.role?.permissions?.includes(PERMISSIONS.BASIC)
       ? [PERMISSIONS.DASHBOARD]
-      : user?.data?.role?.permissions
+      : user?.role?.permissions
     : []
 
   const listVerticalItems = VerticalItems()
