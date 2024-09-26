@@ -1,8 +1,8 @@
 import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // Material-UI
-import { Avatar, Grid, useTheme } from '@mui/material'
+import { Avatar, Grid, IconButton, useTheme } from '@mui/material'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 
@@ -22,8 +22,18 @@ import { useAuth } from 'src/hooks/useAuth'
 import { getAuthMe } from 'src/services/auth'
 import { removeLocalUserData } from 'src/helpers/storage'
 import { useRouter } from 'next/router'
+
+// types
 import { UserDataType } from 'src/contexts/types'
-import { toFullName } from 'src/utils'
+
+import { convertBase64, toFullName } from 'src/utils'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from 'src/stores'
+import toast from 'react-hot-toast'
+import { ROUTE_CONFIG } from 'src/configs/route'
+import { resetIntialState } from 'src/stores/apps/auth'
+import { updateAuthMeAsync } from 'src/stores/apps/auth/action'
+import FallbackSpinner from 'src/components/fall-back'
 
 type TProps = {}
 
@@ -40,6 +50,8 @@ const MyProfilePage: NextPage<TProps> = () => {
 
   // Hooks
   const [loading, setLoading] = useState(false)
+  const [avatar, setAvatar] = useState('')
+
   const [user, setUser] = useState<UserDataType | null>(null)
 
   // ** Router
@@ -47,6 +59,10 @@ const MyProfilePage: NextPage<TProps> = () => {
 
   // theme
   const theme = useTheme()
+
+  // ** redux
+  const dispatch: AppDispatch = useDispatch()
+  const { isLoading, isErrorUpdateMe, message, isSuccessUpdateMe } = useSelector((state: RootState) => state.auth)
 
   const schema = yup.object().shape({
     email: yup.string().email().required("Email can't be empty."),
@@ -68,7 +84,6 @@ const MyProfilePage: NextPage<TProps> = () => {
   const {
     control,
     handleSubmit,
-    setValue,
     formState: { errors },
     reset
   } = useForm({
@@ -76,15 +91,9 @@ const MyProfilePage: NextPage<TProps> = () => {
     mode: 'onBlur',
     resolver: yupResolver(schema)
   })
-  const onsubmit = (data: {
-    email: string
-    role: string
-    address: string
-    city: string
-    phoneNumber: string
-    fullName: string
-  }) => {
-    console.log(data)
+
+  const onsubmit = (data: any) => {
+    console.log('data', data)
   }
 
   const fetchGetAuthMe = async () => {
@@ -92,7 +101,6 @@ const MyProfilePage: NextPage<TProps> = () => {
       .then(async response => {
         setLoading(false)
         const data = response?.data
-        console.log(data)
 
         if (data) {
           reset({
@@ -104,13 +112,8 @@ const MyProfilePage: NextPage<TProps> = () => {
             fullName: toFullName(data?.firstName, data?.lastName, data?.middleName, 'en')
           })
         }
-
-        setUser(response.data)
-        setLoading(false)
       })
       .catch(() => {
-        removeLocalUserData()
-        setUser(null)
         setLoading(false)
       })
   }
@@ -119,32 +122,72 @@ const MyProfilePage: NextPage<TProps> = () => {
     fetchGetAuthMe()
   }, [])
 
-  const handleSubmitUploadAvatar = (file: File) => {
-    console.log(file)
+  useEffect(() => {
+    console.log('1')
+    if (message) {
+      if (isSuccessUpdateMe) {
+        toast.success(message)
+        fetchGetAuthMe()
+      } else if (isErrorUpdateMe) {
+        toast.error(message)
+      }
+      dispatch(resetIntialState())
+    }
+  }, [isSuccessUpdateMe, isErrorUpdateMe, message])
+
+  const handleSubmitUploadAvatar = async (file: File) => {
+    const base64 = await convertBase64(file)
+    setAvatar(base64 as string)
+    console.log(base64)
+  }
+
+  const handleDeleteAvatar = () => {
+    setAvatar('')
   }
 
   return (
     <>
+      {isLoading || (loading && <FallbackSpinner />)}{' '}
       <form onSubmit={handleSubmit(onsubmit)} autoComplete='off' noValidate>
         <Grid container spacing={0} sx={{ padding: 0 }}>
           <Grid item xs={12} sm={6} sx={{ padding: 2 }}>
             <Grid item xs={12} sm={12}>
               <Box>
-                <Avatar
-                  sx={{
-                    width: 100,
-                    height: 100,
-                    margin: 'auto',
-                    marginTop: 8
-                  }}
-                >
-                  <IconifyIcon
-                    icon='mdi:account-circle'
-                    color={theme.palette.primary.contrastText}
-                    width={100}
-                    height={100}
-                  />
-                </Avatar>
+                {avatar ? (
+                  <Box>
+                    {' '}
+                    <Box sx={{ position: 'relative' }}>
+                      <Avatar src={avatar} sx={{ width: 100, height: 100, margin: 'auto' }}>
+                        <IconifyIcon icon='mdi:account' width={50} height={50} opacity={0.6} />
+                      </Avatar>
+                      <IconButton
+                        sx={{
+                          width: 25,
+                          height: 25,
+                          position: 'absolute',
+                          top: 0,
+                          right: '40%',
+                          backgroundColor: theme.palette.primary.main,
+                          opacity: 0.6,
+                          color: 'white',
+                          '&:hover': {
+                            backgroundColor: theme.palette.primary.main,
+                            color: 'white',
+                            opacity: 0.7
+                          }
+                        }}
+                        onClick={handleDeleteAvatar}
+                      >
+                        <IconifyIcon icon='mdi:close' width={16} height={16} />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Avatar sx={{ width: 100, height: 100, margin: 'auto' }}>
+                    <IconifyIcon icon='mdi:account' width={50} height={50} opacity={0.6} />
+                  </Avatar>
+                )}
+
                 <Box sx={{ textAlign: 'center', mt: 3, mb: 2 }}>
                   <WrapperFileUpload
                     uploadFunc={handleSubmitUploadAvatar}
@@ -154,7 +197,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                   >
                     <Button variant='tonal'>
                       <IconifyIcon icon='mdi:camera' width={16} height={16} opacity={0.6} />
-                      <span>{t('Change Avatar')}</span>
+                      {avatar ? <span>{'Change Avatar'}</span> : <span>{'Upload Avatar'}</span>}
                     </Button>
                   </WrapperFileUpload>
                 </Box>
@@ -176,7 +219,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                         required
                         label='Email'
                         autoComplete='email'
-                        placeholder={t('Enter_your_email')}
                         autoFocus
                         onChange={onChange}
                         onBlur={onBlur}
@@ -203,7 +245,6 @@ const MyProfilePage: NextPage<TProps> = () => {
                         required
                         label='Role'
                         autoComplete='role'
-                        placeholder={t('role')}
                         autoFocus
                         onChange={onChange}
                         onBlur={onBlur}
@@ -217,7 +258,7 @@ const MyProfilePage: NextPage<TProps> = () => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid container xs={12} sm={6} sx={{ padding: 0 }} spacing={4} marginTop={15}>
+          <Grid container item xs={12} sm={6} sx={{ padding: 0 }} spacing={0} marginTop={0}>
             <Grid item xs={12} sm={6} sx={{ padding: 0 }}>
               <Box sx={{ width: '100%' }}>
                 <Controller
@@ -229,9 +270,9 @@ const MyProfilePage: NextPage<TProps> = () => {
                     <CustomTextField
                       margin='normal'
                       fullWidth
-                      label='Address'
+                      label={t('Address')}
                       autoComplete='address'
-                      placeholder={t('enter_your_address')}
+                      placeholder={t('Enter your adress')}
                       autoFocus
                       onChange={onChange}
                       onBlur={onBlur}
@@ -255,7 +296,7 @@ const MyProfilePage: NextPage<TProps> = () => {
                       fullWidth
                       label={t('City')}
                       autoComplete='city'
-                      placeholder={t('enter_your_city')}
+                      placeholder={t('Enter your city')}
                       autoFocus
                       onChange={onChange}
                       onBlur={onBlur}
@@ -278,10 +319,10 @@ const MyProfilePage: NextPage<TProps> = () => {
                       margin='normal'
                       fullWidth
                       required
-                      label={t('Phone_number')}
+                      label={t('Phone number')}
                       autoComplete='phoneNumber'
                       autoFocus
-                      placeholder={t('Enter_your_phone_number')}
+                      placeholder={t('Enter your phone number')}
                       onChange={e => {
                         const value = e.target.value
                         if (value.match(/^\d+$/) || value === '') {
@@ -315,9 +356,9 @@ const MyProfilePage: NextPage<TProps> = () => {
                       margin='normal'
                       fullWidth
                       required
-                      label={t('Full_name')}
+                      label={t('Fullname')}
                       autoComplete='fullName'
-                      placeholder={t('Enter_your_full_name')}
+                      placeholder={t('Enter your full name')}
                       autoFocus
                       onChange={onChange}
                       onBlur={onBlur}
@@ -331,10 +372,23 @@ const MyProfilePage: NextPage<TProps> = () => {
               </Box>
             </Grid>
           </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+            <Button
+              type='submit'
+              variant='contained'
+              sx={{
+                mt: 3,
+                mb: 2,
+                opacity: '0.7',
+                '&:hover': {
+                  opacity: '0.9'
+                }
+              }}
+            >
+              Change Profile
+            </Button>
+          </Box>
         </Grid>
-        <Button fullWidth type='submit' variant='outlined' sx={{ mt: 3, mb: 2 }}>
-          Change Profile
-        </Button>
       </form>
     </>
   )

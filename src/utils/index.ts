@@ -2,8 +2,6 @@
 // import { TItemOrderProduct } from 'src/types/order-product'
 
 // ** Libraries
-import { ContentState, EditorState } from 'draft-js'
-import htmlToDraft from 'html-to-draftjs'
 
 export const toFullName = (lastName: string, middleName: string, firstName: string, language: string) => {
   if (language === 'vi') {

@@ -66,7 +66,7 @@ const AuthProvider = ({ children }: Props) => {
             setUser(null)
             setLoading(false)
             if (!router.pathname.includes('/login')) {
-              router.push('/login')
+              // router.push('/login')
             }
           })
       } else {

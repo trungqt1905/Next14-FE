@@ -28,10 +28,8 @@ const initialState = {
   typeError: '',
 
   // ** Auth Me
-  isLoadingAuthMe: false,
-  isSuccessAuthMe: true,
-  isErrorAuthMe: false,
-  messageUpdateMe: '',
+  isSuccessUpdateMe: true,
+  isErrorUpdateMe: false,
   typeErrorUpdateMe: ''
 }
 
@@ -48,9 +46,8 @@ export const authSlice = createSlice({
       state.typeError = ''
 
       // Reset update me
-      state.isSuccessAuthMe = false
-      state.isErrorAuthMe = true
-      state.messageUpdateMe = ''
+      state.isSuccessUpdateMe = false
+      state.isErrorUpdateMe = true
     }
   },
   extraReducers: builder => {
@@ -77,20 +74,20 @@ export const authSlice = createSlice({
 
     // ** Update Auth
     builder.addCase(updateAuthMeAsync.pending, (state, action) => {
-      state.isLoadingAuthMe = true
+      state.isLoading = true
     }) //Đang chờ
     builder.addCase(updateAuthMeAsync.fulfilled, (state, action) => {
       state.isLoading = false
-      state.isSuccessAuthMe = !!action.payload?.data?.email // !! true nếu email tồn tồn tại - ngược lại
-      state.isErrorAuthMe = !action.payload?.data?.isError // message nếu tồn tại - ngược lại
-      state.messageUpdateMe = action.payload?.message
+      state.message = action.payload?.message
+      state.isSuccessUpdateMe = !!action.payload?.data?.email // !! true nếu email tồn tồn tại - ngược lại
+      state.isErrorUpdateMe = !action.payload?.data?.isError // message nếu tồn tại - ngược lại
       state.typeErrorUpdateMe = action.payload?.typeError
     }) //Thành công
     builder.addCase(updateAuthMeAsync.rejected, (state, action) => {
       state.isLoading = false
-      state.isSuccessAuthMe = false
-      state.isErrorAuthMe = false
-      state.messageUpdateMe = ''
+      state.message = ''
+      state.isSuccessUpdateMe = false
+      state.isErrorUpdateMe = false
       state.typeErrorUpdateMe = ''
     }) //Thất bại
     // ** Update Auth

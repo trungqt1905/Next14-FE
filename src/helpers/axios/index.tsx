@@ -17,11 +17,13 @@ const handleRedirectToLogin = (router: NextRouter, setUser: (data: UserDataType 
   if (router.asPath !== '/') {
     router.replace({
       pathname: '/login',
-      query: { returnUrl: router.asPath } // Đang ở product thì chuyển qua login,
+      query: { returnUrl: router.asPath } 
+
+      // Đang ở product thì chuyển qua login,
       // sau khi login xong sẽ chuyển lại product
     })
   } else {
-    router.replace('/login')
+    // router.replace('/login')
     setUser(null)
     removeLocalUserData()
   }

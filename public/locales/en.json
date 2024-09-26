@@ -7,13 +7,5 @@
     "Logout" : "Logout",
     "Change Avatar": "Change Avatar",
     "Manage_system" : "Manage System",
-    "Enter_your_email" : "Enter your email",
-    "role" : "Role",
-    "enter_your_address" : "Enter your address",
-    "enter_your_city" : "Enter your city",
-    "City" : "City",
-    "Phone_number" : "Phone Number",
-    "Enter_your_phone_number" : "Enter your phone number",
-    "Full_name" : "Full Name",
-    "Enter_your_full_name": "Enter your full name"
+    "role" : "Role"
 }

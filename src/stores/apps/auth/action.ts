@@ -26,16 +26,16 @@ export const registerAuthAsync = createAsyncThunk('auth/register', async (data: 
   }
 }) //Action async là những action liên quan đến api của mình
 
-export const updateAuthMeAsync = createAsyncThunk('auth/updateAuthMe', async (data: any, { rejectWithValue }) => {
+export const updateAuthMeAsync = createAsyncThunk('auth/updateAuthMe', async (data: any) => {
   try {
     const response = await updateAuthMe(data)
-    
+
     return response
   } catch (error: any) {
-    return rejectWithValue({
+    return {
       data: null,
       message: error.response.data.message,
       typeError: error.response.data.typeError
-    })
+    }
   }
 }) //Action async là những action liên quan đến api của mình
